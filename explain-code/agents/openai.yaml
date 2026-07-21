@@ -1,0 +1,4 @@
+interface:
+  display_name: "Explain Code"
+  short_description: "Concrete, plain-English code walkthroughs"
+  default_prompt: "Use $explain-code to walk me through this component one section at a time."
