@@ -19,17 +19,32 @@ does not turn the answer into a line-by-line translation of the source.
 
 ## Illustrated pages
 
-Prose is the default. When you ask for a diagram, a visual, or a document to keep
-or share, the skill instead builds a single self-contained HTML page and applies a
-figure taxonomy in which each figure renders one of the rules above: a stage map
-for execution order, a side-by-side trace for a mechanism's boundary, a
-before-and-after for a rewrite, a data-shape panel for the representation, a
-boundary ledger for responsibility limits, a timeline for ordering, and a chart
-only for numbers that were actually measured.
+Every invocation produces a self-contained HTML page, written to disk and also
+published as an artifact where the host supports it. Ask for something *quick* or
+*in chat* to get prose instead.
 
-The page keeps machine-produced text — identifiers, records, paths, values — in a
-monospace face and the argument in a prose face, so a reader can tell a claim from
-an observation at a glance.
+Each figure renders one of the rules above: a stage map for execution order, a
+side-by-side trace for a mechanism's boundary, a before-and-after for a rewrite,
+a data-shape panel for the representation, a boundary ledger for responsibility
+limits, a timeline for ordering, and a chart only for measured numbers. The page
+keeps machine-produced text — identifiers, records, paths, values — in a
+monospace face and the argument in a prose face, so a reader can tell a claim
+from an observation at a glance.
+
+The visual identity is fixed rather than designed per subject, so a set of pages
+reads as one series. It ships as a stylesheet, a component skeleton, and a review
+script under [`explain-code/assets/`](explain-code/assets/).
+
+## Reviewing a page
+
+Every page carries a review layer. Hover any section or figure for **+ comment**,
+or select text first to quote it, and file a note or a question. Comments persist
+in `localStorage` across reloads. When you have finished reading, **Copy for
+Claude** puts the whole batch on the clipboard as markdown, grouped by section
+and quoting whatever you highlighted — paste it back into the conversation.
+
+It declares no artifact capabilities and makes no network requests, so a local
+file and a published artifact behave identically.
 
 ## Install
 
@@ -74,6 +89,10 @@ this kind of technical walkthrough.
 ```text
 explain-code/
   SKILL.md
+  assets/
+    house-style.css       tokens, typography, and every figure component
+    page-skeleton.html    markup for each component; the starting template
+    comments.js           the review layer
   agents/
     openai.yaml
 ```
