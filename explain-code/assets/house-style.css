@@ -416,6 +416,8 @@ figure:hover + .ec-ui .ec-add,
 .ec-add:hover { color: var(--ok); border-color: var(--ok); }
 
 .ec-composer {
+  scroll-margin-bottom: 110px;
+  scroll-margin-top: 24px;
   max-width: var(--wide);
   margin: 10px auto 0;
   background: var(--surface);
@@ -515,6 +517,18 @@ figure:hover + .ec-ui .ec-add,
   font-style: normal;
 }
 
+.ec-orphans { max-width: var(--wide); margin: 40px auto 0; padding-top: 18px; border-top: 1px dashed var(--stop); }
+.ec-orphans h4 {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--stop);
+  margin-bottom: 4px;
+}
+.ec-orphans .ec-note { border-left-color: var(--stop); }
+.ec-was { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); margin-bottom: 7px; }
+
 .ec-dock {
   position: fixed;
   right: 20px;
@@ -537,7 +551,7 @@ figure:hover + .ec-ui .ec-add,
   font-variant-numeric: tabular-nums;
 }
 .ec-dock.empty .ec-copy, .ec-dock.empty .ec-clear { display: none; }
-.ec-dock.empty { opacity: 0.72; }
+.ec-dock.empty .ec-count { opacity: 0.72; }
 .ec-copy, .ec-clear {
   font-family: var(--mono);
   font-size: 11px;
@@ -564,4 +578,10 @@ figure:hover + .ec-ui .ec-add,
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.32);
 }
 
-@media print { .ec-rail, .ec-dock, .ec-composer { display: none; } }
+@media (max-width: 560px) {
+  .ec-dock { right: 12px; bottom: 12px; left: 12px; padding: 8px 10px; gap: 8px; }
+  .ec-dock .ec-count { flex: 1; min-width: 0; }
+  .ec-copy, .ec-clear { padding: 5px 8px; }
+}
+
+@media print { .ec-rail, .ec-dock, .ec-composer, .ec-orphans { display: none; } }

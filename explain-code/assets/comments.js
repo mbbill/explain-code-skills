@@ -35,17 +35,38 @@
     return String(s).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
   }
 
+  function clamp(t, n) {
+    if (t.length <= n) return t;
+    return t.slice(0, n).replace(/\s+\S*$/, "") + "\u2026";
+  }
+
+  /* The .num marker must come off before reading a heading, or textContent
+     concatenates it: "1Where the slot is allocated". */
+  function headingText(h) {
+    var c = h.cloneNode(true);
+    var n = c.querySelector(".num");
+    if (n) n.remove();
+    return c.textContent.replace(/\s+/g, " ").trim();
+  }
+
   /* A block's label is what the exported markdown groups under, so it must read
-     like something the user can find again: a heading or a figure caption. */
+     like something the user can find again. A div.fig panel -- key numbers, a
+     boundary ledger -- has neither heading nor caption, so it borrows its
+     section's heading rather than exporting as a meaningless "Block 8". */
   function labelFor(block, index) {
     var h = block.querySelector("h1, h2, h3");
-    if (h) return h.textContent.replace(/\s+/g, " ").trim();
-    var cap = block.querySelector("figcaption b");
+    if (h) return headingText(h);
+
+    var cap = block.querySelector("figcaption");
     if (cap) {
-      var full = block.querySelector("figcaption");
-      var t = full ? full.textContent.replace(/\s+/g, " ").trim() : cap.textContent;
-      return t.split(".").slice(0, 2).join(".").trim().slice(0, 90);
+      var t = cap.textContent.replace(/\s+/g, " ").trim();
+      return clamp(t.split(".").slice(0, 2).join(".").trim(), 90);
     }
+
+    var sec = block.closest("section");
+    var sh = sec && sec.querySelector("h1, h2, h3");
+    if (sh) return headingText(sh) + " \u2014 panel " + (index + 1);
+
     return "Block " + (index + 1);
   }
 
@@ -63,11 +84,13 @@
     var add = document.createElement("button");
     add.type = "button";
     add.className = "ec-add";
-    add.textContent = "+ comment";
+    add.textContent = block.tagName === "FIGURE" ? "+ comment on figure"
+                    : block.classList.contains("fig") ? "+ comment on panel"
+                    : "+ comment";
     add.setAttribute("aria-label", "Add a comment on: " + label);
     add.addEventListener("click", function () {
       var sel = lastSel.node && block.contains(lastSel.node) ? lastSel.text : "";
-      openComposer(block, sel.slice(0, 400));
+      openComposer(block, clamp(sel, 400));
     });
 
     rail.appendChild(add);
@@ -80,9 +103,18 @@
     else block.appendChild(ui);
   });
 
+  var orphans = document.createElement("div");
+  orphans.className = "ec-orphans";
+  orphans.hidden = true;
+
   var lastSel = { text: "", node: null };
   document.addEventListener("mouseup", captureSelection);
   document.addEventListener("keyup", captureSelection);
+  document.addEventListener("mousedown", function (ev) {
+    /* The press that collapses a selection also invalidates the memory of it --
+       except on the review UI itself, whose button press must not eat the quote. */
+    if (!ev.target.closest(".ec-ui")) lastSel = { text: "", node: null };
+  });
 
   function captureSelection() {
     var s = window.getSelection && window.getSelection();
@@ -175,60 +207,89 @@
     });
 
     block._ecUi.appendChild(box);
+    box.scrollIntoView({ block: "center" });
     ta.focus();
+  }
+
+  /* `block` is null for an orphan: its anchor is gone, so it can be read and
+     deleted but not edited back onto a block that no longer exists. */
+  function makeCard(c, block) {
+    var card = document.createElement("div");
+    card.className = "ec-note ec-kind-" + c.kind;
+
+    var head = document.createElement("div");
+    head.className = "ec-head";
+    var tag = document.createElement("span");
+    tag.className = "ec-tag";
+    tag.textContent = block ? c.kind : c.kind + " \u00b7 orphaned";
+    head.appendChild(tag);
+
+    var tools = document.createElement("span");
+    tools.className = "ec-tools";
+    if (block) {
+      var ed = document.createElement("button");
+      ed.type = "button";
+      ed.textContent = "edit";
+      ed.addEventListener("click", function () { openComposer(block, c.quote, c); });
+      tools.appendChild(ed);
+    }
+    var del = document.createElement("button");
+    del.type = "button";
+    del.textContent = "delete";
+    del.addEventListener("click", function () {
+      items = items.filter(function (x) { return x.id !== c.id; });
+      persist();
+      render();
+    });
+    tools.appendChild(del);
+    head.appendChild(tools);
+    card.appendChild(head);
+
+    if (!block) {
+      var was = document.createElement("div");
+      was.className = "ec-was";
+      was.textContent = "was: " + c.label;
+      card.appendChild(was);
+    }
+    if (c.quote) {
+      var qq = document.createElement("blockquote");
+      qq.className = "ec-quote";
+      qq.textContent = c.quote;
+      card.appendChild(qq);
+    }
+    var body = document.createElement("p");
+    body.className = "ec-body";
+    body.textContent = c.body;
+    card.appendChild(body);
+    return card;
   }
 
   function render() {
     document.querySelectorAll(".ec-note").forEach(function (n) { n.remove(); });
 
+    var known = {};
     blocks.forEach(function (block) {
+      known[block.dataset.ecId] = 1;
       var host = block._ecUi;
-      var mine = items.filter(function (c) { return c.block === block.dataset.ecId; });
-
-      mine.forEach(function (c) {
-        var card = document.createElement("div");
-        card.className = "ec-note ec-kind-" + c.kind;
-
-        var head = document.createElement("div");
-        head.className = "ec-head";
-        var tag = document.createElement("span");
-        tag.className = "ec-tag";
-        tag.textContent = c.kind;
-        head.appendChild(tag);
-
-        var tools = document.createElement("span");
-        tools.className = "ec-tools";
-        var ed = document.createElement("button");
-        ed.type = "button";
-        ed.textContent = "edit";
-        ed.addEventListener("click", function () { openComposer(block, c.quote, c); });
-        var del = document.createElement("button");
-        del.type = "button";
-        del.textContent = "delete";
-        del.addEventListener("click", function () {
-          items = items.filter(function (x) { return x.id !== c.id; });
-          persist();
-          render();
+      items.filter(function (c) { return c.block === block.dataset.ecId; })
+        .forEach(function (c) {
+          host.insertBefore(makeCard(c, block), host.querySelector(".ec-rail"));
         });
-        tools.appendChild(ed);
-        tools.appendChild(del);
-        head.appendChild(tools);
-
-        card.appendChild(head);
-        if (c.quote) {
-          var qq = document.createElement("blockquote");
-          qq.className = "ec-quote";
-          qq.textContent = c.quote;
-          card.appendChild(qq);
-        }
-        var p = document.createElement("p");
-        p.className = "ec-body";
-        p.textContent = c.body;
-        card.appendChild(p);
-
-        host.insertBefore(card, host.querySelector(".ec-rail"));
-      });
     });
+
+    /* Block identity is derived from heading text, so editing a heading between
+       review rounds silently detaches its comments. Without this they would still
+       be counted and still be exported, but be invisible and undeletable except
+       by wiping every comment on the page. */
+    orphans.textContent = "";
+    var lost = items.filter(function (c) { return !known[c.block]; });
+    orphans.hidden = lost.length === 0;
+    if (lost.length) {
+      var h = document.createElement("h4");
+      h.textContent = "Orphaned \u2014 the page changed since these were written";
+      orphans.appendChild(h);
+      lost.forEach(function (c) { orphans.appendChild(makeCard(c, null)); });
+    }
 
     updateDock();
   }
@@ -308,6 +369,8 @@
       ta.addEventListener("blur", function () { ta.remove(); });
     }
   }
+
+  document.body.appendChild(orphans);
 
   dock.appendChild(count);
   dock.appendChild(copy);
