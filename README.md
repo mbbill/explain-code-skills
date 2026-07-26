@@ -17,10 +17,32 @@ It helps Codex explain one complete component at a time by showing:
 The skill favors implementation-shaped explanations over broad summaries, but
 does not turn the answer into a line-by-line translation of the source.
 
+## Illustrated pages
+
+Prose is the default. When you ask for a diagram, a visual, or a document to keep
+or share, the skill instead builds a single self-contained HTML page and applies a
+figure taxonomy in which each figure renders one of the rules above: a stage map
+for execution order, a side-by-side trace for a mechanism's boundary, a
+before-and-after for a rewrite, a data-shape panel for the representation, a
+boundary ledger for responsibility limits, a timeline for ordering, and a chart
+only for numbers that were actually measured.
+
+The page keeps machine-produced text — identifiers, records, paths, values — in a
+monospace face and the argument in a prose face, so a reader can tell a claim from
+an observation at a glance.
+
 ## Install
 
-Copy the [`explain-code`](explain-code/) directory into your Codex skills
-directory, normally `~/.codex/skills/`.
+Copy the [`explain-code`](explain-code/) directory into your agent's skills
+directory:
+
+```sh
+# Codex
+cp -R explain-code ~/.codex/skills/
+
+# Claude Code
+cp -R explain-code ~/.claude/skills/
+```
 
 ## Use
 
@@ -38,6 +60,10 @@ state changes and failure behavior.
 ```text
 Use $explain-code to explain this proposed lexer design close enough to
 implementation that I can picture the data structures and scan loop.
+```
+
+```text
+Use $explain-code to explain this scheduler as a page, with diagrams.
 ```
 
 The skill can also be selected automatically when a request clearly asks for
