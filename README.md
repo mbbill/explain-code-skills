@@ -4,6 +4,10 @@
 source code, algorithms, data structures, APIs, execution flows, and
 implementation-oriented designs.
 
+It teaches rather than summarizes: every imported concept is introduced by the
+smallest example that makes it obvious, at the point it first carries weight,
+because the writer has done the reading and the reader has not.
+
 It helps Codex explain one complete component at a time by showing:
 
 - what the component receives and produces;

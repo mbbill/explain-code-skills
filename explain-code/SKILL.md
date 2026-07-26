@@ -128,6 +128,36 @@ Choose one small but realistic input. Show the important intermediate representa
 
 Good examples expose boundaries and edge behavior. Avoid examples that simply repeat the happy-path prose without making the mechanism clearer.
 
+## Teach every concept you import, where you first use it
+
+You did the reading. The reader did not. By the time you write, a term you met an hour ago feels like shared vocabulary, so you drop it into a sentence unexplained and move on — and the reader stops there, because a step your argument rests on was opaque to them. This is the most common way a technically correct explanation fails.
+
+The rule: **the first time a concept carries weight, teach it with the smallest example that makes it obvious.** Not a definition — an example. Definitions are how you record something the reader can already picture.
+
+Prefer:
+
+> Splitting a sum across cores regroups the additions, and floating-point addition is not associative:
+>
+> ```text
+> (1e20 + -1e20) + 1.0  =  1.0
+> 1e20 + (-1e20 + 1.0)  =  0.0     ← 1.0 is too small to survive beside 1e20
+> ```
+>
+> Same numbers, different grouping, answers differing by the whole value.
+
+Avoid:
+
+> Strict IEEE semantics forbid the reassociation a parallel reduction requires.
+
+The second sentence is true, shorter, and useless to anyone who did not already know it. The first costs five lines and leaves the reader able to rebuild the argument without you.
+
+This applies to imported jargon (*prefix sum*, *loop-carried dependence*, *may-alias*, *span*, *arithmetic intensity*), to named results you are leaning on, and to any acronym carried over from a source. If a term is in your explanation only because it was in your reading, either teach it or cut it.
+
+Two habits that catch the failure:
+
+- Reread the draft as someone who has not seen your sources. Every sentence that would make them stop marks a missing example.
+- Derive numbers instead of asserting them. "One core already wants 70 GB/s while the whole chip supplies 103" earns its conclusion; "these kernels are memory-bound" asks to be believed.
+
 ## Use simple English precisely
 
 - Introduce one new term at a time and define it immediately.
@@ -232,6 +262,33 @@ Avoid:
 The first tells the reader what to take away. The second makes them derive it
 again from a figure they have already looked at.
 
+### Make each component earn its place against a plain list
+
+The stylesheet offers boxes, grids and panels, and reaching for them is the
+default failure mode of a page. **A grid of four boxes, each holding a number and
+one line of text, is worse than four bullet points** — the boxes cap what each
+item can say, so the reasoning gets truncated to fit, and the reader gets less
+than prose would have given them.
+
+The test, applied to every component before you use it: *would the same items as
+a plain list carry more?* If yes, use the list. Layout is not information.
+
+What survives that test:
+
+- **A worked example** — an actual input and what happens to it. The strongest
+  thing on any page and the reason to reach for a figure at all.
+- **A side-by-side trace** — the same mechanism on an input it handles and one it
+  does not. Two columns because the comparison is the point.
+- **A chart** — but only where *magnitude* is the argument and the shape says
+  something a sentence cannot. A bar chart of six values you would otherwise
+  write in a sentence is decoration; one where the shortest bar uses the most
+  cores earns itself.
+- **A table** — only for several exact mappings across the same columns. Three
+  rows of prose in a two-column table is a list wearing a costume.
+
+Prefer a paragraph naming four measurements and explaining what each implies to a
+row of four stat boxes holding the same four numbers with their explanations cut.
+
 ### What not to do
 
 - Do not add a figure that only restates an adjacent paragraph.
@@ -324,6 +381,7 @@ comments already filed against it.
 Verify:
 
 - Can the reader trace one input through the component?
+- Is every imported concept taught by example where it first carries weight, rather than named and left?
 - Did I show the important representation instead of only naming abstractions?
 - Did I follow execution order?
 - Did I explain why the non-obvious choices exist?
@@ -334,6 +392,7 @@ Verify:
 And for the page:
 
 - Does every figure carry something the prose does not?
+- Would any component I used be better as a plain list? (Stat grids almost always are.)
 - Does every trace panel end in a verdict?
 - Is each structural device — numbering, ordering, grouping — true of the content?
 - Is every inferred or estimated number labeled as one?
