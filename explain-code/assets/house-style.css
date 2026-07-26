@@ -1,10 +1,13 @@
 /* ============================================================================
    explain-code house style
    ----------------------------------------------------------------------------
-   Inline this verbatim in a <style> block. Do not re-derive the palette and do
-   not re-run a palette validator: these values already pass the lightness band,
-   chroma floor, CVD separation, normal-vision floor, and contrast checks in
-   both light and dark modes.
+   Inline this verbatim in a <style> block. Do not re-derive the mark palette
+   (--ok / --warn / --stop) and do not re-run a palette validator: those three
+   already pass the lightness band, chroma floor, CVD separation, normal-vision
+   floor, and contrast checks against both surfaces. The muted ink step
+   (--ink-3) is a deliberate house choice for captions and axis labels and sits
+   near 4.1 against the surface; do not use it for anything a reader must read
+   to follow the argument.
 
    The one rule that carries meaning: the serif face is the human argument, the
    monospace face is anything the machine produced -- identifiers, records, IR,
@@ -229,14 +232,18 @@ pre .w { color: var(--warn);  }  /* the caution path   */
   background: var(--ok-bg);
   border: 1px solid var(--ok);
   border-radius: 2px;
-  padding: 7px 6px 6px;
+  padding: 7px 0 6px;
   text-align: center;
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
+/* Horizontal padding lives on the children, not the segment: as a flex item the
+   segment's own padding would be fixed width shared equally between segments,
+   which skews the very proportions the figure exists to show. */
+.seg b, .seg i { padding-inline: 6px; }
 .seg b { font-size: 12px; font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.seg i { font-size: 10px; font-style: normal; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.seg i { font-size: 10px; font-style: normal; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .seg.trivia { background: none; border-color: var(--rule-2); }  /* padding, whitespace, any skipped span */
 .seg.trivia b { color: var(--ink-3); font-weight: 400; }
 .seg.bad { background: var(--stop-bg); border-color: var(--stop); }

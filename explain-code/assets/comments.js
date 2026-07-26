@@ -73,9 +73,14 @@
   var blocks = [].slice.call(document.querySelectorAll("section, figure, div.fig"))
     .filter(function (b) { return !b.closest(".ec-dock"); });
 
+  var usedIds = {};
+
   blocks.forEach(function (block, i) {
     var label = labelFor(block, i);
-    block.dataset.ecId = slug(label) || "block-" + i;
+    var id = slug(label) || "block-" + i;
+    if (usedIds[id]) id = id + "-" + (i + 1);
+    usedIds[id] = 1;
+    block.dataset.ecId = id;
     block.dataset.ecLabel = label;
 
     var rail = document.createElement("div");
@@ -207,7 +212,10 @@
     });
 
     block._ecUi.appendChild(box);
-    box.scrollIntoView({ block: "center" });
+    var r = box.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight - 110) {
+      box.scrollIntoView({ block: "center" });
+    }
     ta.focus();
   }
 
