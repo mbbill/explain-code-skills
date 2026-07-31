@@ -28,6 +28,11 @@ fi
 d=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 title=$(printf '%s' "$raw" | sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g')
 
+if ! : > "$out"; then
+  echo "$0: could not write $out" >&2
+  exit 1
+fi
+
 {
   printf '<!doctype html>\n<html lang="en">\n<head>\n'
   printf '<meta charset="utf-8">\n'

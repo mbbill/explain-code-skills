@@ -1,17 +1,16 @@
-<!-- ============================================================================
+<!-- ==========================================================================
      explain-code page skeleton
-     ---------------------------------------------------------------------------
-     A complete minimal page showing the markup for every house-style component.
-     Start from this, delete the figures the subject does not contain, and fill
-     the rest with real content.
+     ==========================================================================
+     Start with the prose document below. Add a visual only when you can name
+     the extra relationship it reveals. The optional snippets at the bottom are
+     deliberately commented out; copy one into a section only when it earns its
+     place.
 
-     For a standalone file, write only the body below and run:
+     For a standalone file, write only the body and run:
          assets/assemble.sh "Page title" body.html out.html
-     which adds the doctype, head, charset, viewport, stylesheet and script.
 
-     When publishing through a host that supplies its own page shell (Claude
-     Code's Artifact tool), pass this body plus an inline <style> and <script>
-     and no doctype/html/head/body wrapper -- the host adds one.
+     A host that supplies its own page shell needs this body plus the contents
+     of house-style.css and comments.js, without an html/head/body wrapper.
      ========================================================================= -->
 
 <header class="mast">
@@ -20,200 +19,132 @@
     <span>Explanation</span>
     <span>2026-01-01</span>
   </div>
-  <h1>One question the page answers</h1>
+  <h1>The concrete question this page answers</h1>
   <p class="standfirst">
-    What the component receives, what it does, what it produces — in one
-    sentence a reader can hold while they read the rest.
+    Name the input, the work, and the output in one sentence the reader can keep
+    in mind while reading the rest.
   </p>
 </header>
 
-<!-- Number only when the numbering is true: a real sequence, a version order,
-     or a ranked list. When nothing is a sequence, drop the .num span entirely --
-     a repeated § on every heading is decoration, not structure. -->
 <section>
-  <h2><span class="num">1</span>Section title</h2>
+  <h2>The concrete case</h2>
   <div class="col">
-    <p>Prose stays inside <code>.col</code> so it keeps its measure.</p>
+    <p>
+      Begin with the smallest literal execution that makes the section's question
+      concrete. Put it here before terminology or general rules.
+    </p>
+<pre>input: the smallest concrete value
+step 1: the first important state
+step 2: the decisive state                 → observable result</pre>
+    <p>
+      <strong>What this shows:</strong> point to the decisive line and explain why
+      it matters. If this is a failure or unsafe rewrite, show both paths and say
+      “See the problem” before naming the general concept.
+    </p>
   </div>
+  <aside class="checkpoint">
+    State the conclusion the reader should be able to reconstruct so far.
+  </aside>
+</section>
 
-  <!-- STAGE MAP — execution order, and which stage is the weak one -->
-  <figure class="fig">
-    <div class="stages">
-      <div class="stage">
-        <span class="sn">Stage 1</span>
-        <span class="st">What it does</span>
-        <span class="sd">One sentence on the job.</span>
-        <span><span class="pill p-ok">Works</span></span>
-      </div>
-      <div class="stage">
-        <span class="sn">Stage 2</span>
-        <span class="st">What it does</span>
-        <span class="sd">One sentence on the job.</span>
-        <span><span class="pill p-stop">Wall</span></span>
-      </div>
-    </div>
-    <!-- Constraints that sit outside the sequence and can veto a correct result -->
-    <div class="gates">
-      <div class="gate">
-        <span class="pill p-stop">Gate</span>
-        <span class="gt">What it blocks</span>
-        <span class="gd">Why it blocks it.</span>
-      </div>
-    </div>
-    <figcaption><b>Figure 1.</b> State the reason or consequence — never restate the contents.</figcaption>
-  </figure>
-
-  <!-- DATA-SHAPE PANEL — what the record holds, and what it conspicuously lacks -->
-  <figure class="fig">
-<pre><span class="c">// path/to/file.rs:210</span>
+<section>
+  <h2>How the mechanism works</h2>
+  <div class="col">
+    <p>
+      Describe the input and output, then show the smallest data shape that makes
+      the mechanism understandable.
+    </p>
+<pre><span class="c">// path/to/file.rs</span>
 Record {
-    field: Type,        <span class="c">// what it carries</span>
+    field: Type,
 }</pre>
-    <figcaption><b>Figure 2.</b> Note what the shape does <b>not</b> contain, when that is the point.</figcaption>
-  </figure>
-
-  <!-- SIDE-BY-SIDE TRACE — reach for this first. Every panel ends in a verdict. -->
-  <figure class="fig">
-    <div class="trace">
-      <div class="tpanel">
-        <header><span>Input it handles</span><span class="pill p-ok">Proved</span></header>
-        <div class="tbody">
-<pre>real identifiers
-real intermediate values
-    <span class="k">→ the good path</span></pre>
-          <div class="verdict v-ok">
-            what the mechanism computed<br>
-            <b>→ the conclusion</b>
-          </div>
-        </div>
-      </div>
-      <div class="tpanel">
-        <header><span>Input it does not</span><span class="pill p-stop">Stops</span></header>
-        <div class="tbody">
-<pre>the same mechanism
-different input
-    <span class="r">→ the failing path</span></pre>
-          <div class="verdict v-stop">
-            where it stopped and why<br>
-            <b>→ the conclusion</b>
-          </div>
-        </div>
-      </div>
-    </div>
-    <figcaption><b>Figure 3.</b> The same relation on both inputs. The boundary is the point.</figcaption>
-  </figure>
-
-  <!-- BOUNDARY LEDGER — checked here versus checked elsewhere, and by whom -->
-  <div class="fig">
-    <div class="ledger">
-      <div>
-        <h4 class="yes">Checked here</h4>
-        <ul>
-          <li>A property this component can establish from what it holds.</li>
-        </ul>
-      </div>
-      <div>
-        <h4 class="no">Not checked here</h4>
-        <ul>
-          <li>A property that needs information another named component owns.</li>
-        </ul>
-      </div>
-    </div>
+    <p>
+      Walk through state changes in execution order. Say what each cursor,
+      collection, or retained value means, when output becomes visible, and what
+      happens if a step fails.
+    </p>
+    <h3>A worked execution</h3>
+    <p>
+      Trace one realistic input through the important intermediate values to the
+      observable result. Derive the conclusion instead of merely asserting it.
+    </p>
   </div>
+</section>
 
-  <!-- BEFORE AND AFTER — what changed, and what is preserved -->
-  <figure class="fig">
-    <div class="trace">
-      <div class="tpanel">
-        <header><span>Before</span><span class="pill p-stop">Problem</span></header>
-        <div class="tbody">
-<pre>the original shape</pre>
-          <div class="verdict v-stop"><b>→ why it is a problem</b></div>
-        </div>
-      </div>
-      <div class="tpanel">
-        <header><span>After</span><span class="pill p-ok">Fixed</span></header>
-        <div class="tbody">
-<pre>the rewritten shape</pre>
-          <div class="verdict v-ok"><b>→ what is preserved</b></div>
-        </div>
-      </div>
-    </div>
-    <figcaption><b>Figure 4.</b> Say what is preserved, not only what changed.</figcaption>
-  </figure>
-
-  <!-- SPAN STRIP — intervals tiling a linear domain; shows coverage -->
-  <figure class="fig">
-    <div class="spanwrap">
-      <div class="spanstrip">
-        <div class="seg"        style="flex-grow:3"><b>let</b><i>[0,3)</i></div>
-        <div class="seg trivia" style="flex-grow:1"><b>·</b><i>[3,4)</i></div>
-        <div class="seg"        style="flex-grow:1"><b>x</b><i>[4,5)</i></div>
-        <div class="seg bad"    style="flex-grow:2"><b>@?</b><i>[5,7)</i></div>
-      </div>
-      <div class="spanaxis"><span>offset 0</span><span>7</span></div>
-    </div>
-    <figcaption><b>Figure 5.</b> Set <code>flex-grow</code> to each interval's width. Use <b>.trivia</b> for
-    skipped spans and <b>.bad</b> for the failing one; the point is that the pieces tile with no gap.</figcaption>
-  </figure>
-
-  <!-- KEY NUMBERS — any exact load-bearing value, measured or counted -->
-  <div class="fig">
-    <div class="keys">
-      <div class="key"><span class="kv" style="color:var(--warn)">42</span><span class="kl">What it counts, and why it matters.</span></div>
-      <div class="key"><span class="kv" style="color:var(--ok)">1.0×</span><span class="kl">What it measures.</span></div>
-    </div>
+<section>
+  <h2>Checks, boundaries, and evidence</h2>
+  <div class="col">
+    <p>
+      State what this component can establish from the information it owns.
+      Then name what it cannot establish, which later component owns that
+      decision, and why the information belongs there.
+    </p>
+    <ul class="prose">
+      <li><strong>Checked here:</strong> the local property and its enforcement.</li>
+      <li><strong>Checked elsewhere:</strong> the named owner and required input.</li>
+      <li><strong>Failure:</strong> what the caller observes.</li>
+      <li><strong>Limit:</strong> what this explanation or evidence does not prove.</li>
+    </ul>
   </div>
-
-  <!-- TABLE — several exact mappings -->
-  <figure class="fig">
-    <div class="tw">
-      <table>
-        <thead><tr><th>Case</th><th>Behavior</th></tr></thead>
-        <tbody>
-          <tr><td class="sys">Name</td><td>What happens.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <figcaption><b>Figure 6.</b> A table only when there are several exact mappings.</figcaption>
-  </figure>
-
-  <!-- CHART — measured numbers only; label inferred values as inferred -->
-  <figure class="fig">
-    <svg class="chart" viewBox="0 0 900 120" role="img" aria-label="Describe the data in words for screen readers.">
-      <line class="axis" x1="200" y1="20" x2="200" y2="100"></line>
-      <line class="grid" x1="500" y1="20" x2="500" y2="100"></line>
-      <text class="lab" x="188" y="42" text-anchor="end">Label</text>
-      <rect x="200" y="30" width="300" height="18" rx="3" class="bar-ok"></rect>
-      <text class="val" x="512" y="42">2.0×</text>
-      <text class="sub" x="200" y="114">Lower is better. Say what the axis means.</text>
-    </svg>
-    <figcaption><b>Figure 7.</b> Single series takes no legend — the title names it. Direct-label the values.</figcaption>
-  </figure>
-
-  <!-- RANKED OPTIONS -->
-  <div class="fig">
-    <div class="tiers">
-      <div class="tier">
-        <span class="tl">Option A</span>
-        <span>
-          <span class="tt">Name <span class="pill p-ok" style="margin-left:6px">Best value</span></span>
-          <span class="td">What it involves.</span>
-        </span>
-        <span class="tc">2–4 weeks</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- PULL QUOTE — a real quotation, attributed -->
-  <blockquote class="col">
-    A sentence worth reading twice, quoted exactly.
-    <cite>Source · Reference · Year</cite>
-  </blockquote>
 </section>
 
 <footer class="close">
-  Status, scope, or caveat line<br>
+  Sources, version, or evidence status<br>
   What this page does not claim
 </footer>
 
+<!-- OPTIONAL REAL DESIGN FORK
+     Include only when the implementation genuinely had alternatives.
+
+<div class="col">
+  <h3>The realistic choices</h3>
+  <ul class="prose">
+    <li><strong>Option one.</strong> What it buys and what it costs.</li>
+    <li><strong>Option two.</strong> The different tradeoff it makes.</li>
+    <li><strong>Chosen approach.</strong> Why this code selects it.</li>
+  </ul>
+</div>
+-->
+
+<!-- OPTIONAL SIDE-BY-SIDE TRACE
+     Use only when the same mechanism on contrasting inputs is the point.
+
+<figure class="fig">
+  <div class="trace">
+    <div class="tpanel">
+      <header><span>Input it handles</span><span class="pill p-ok">Accepted</span></header>
+      <div class="tbody">
+<pre>real input
+real intermediate values</pre>
+        <div class="verdict v-ok"><b>Conclusion:</b> what the mechanism proved.</div>
+      </div>
+    </div>
+    <div class="tpanel">
+      <header><span>Boundary case</span><span class="pill p-stop">Stops</span></header>
+      <div class="tbody">
+<pre>contrasting input
+the same intermediate steps</pre>
+        <div class="verdict v-stop"><b>Conclusion:</b> where it stopped and why.</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>Figure 1.</b> State the consequence, not merely the contents.</figcaption>
+</figure>
+-->
+
+<!-- OPTIONAL EXACT-MAPPING TABLE
+     Use only for several records sharing the same meaningful columns.
+
+<figure class="fig">
+  <div class="tw">
+    <table>
+      <thead><tr><th>Input</th><th>Owner</th><th>Observable result</th></tr></thead>
+      <tbody>
+        <tr><td class="sys">case_a</td><td>Component A</td><td>Accepted</td></tr>
+        <tr><td class="sys">case_b</td><td>Component B</td><td>Rejected</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <figcaption><b>Table 1.</b> Explain the mapping's consequence.</figcaption>
+</figure>
+-->

@@ -1,6 +1,6 @@
 ---
 name: explain-code
-description: Explain source code, algorithms, APIs, data structures, execution flows, and implementation-oriented technical designs in concrete plain English. Use when a user asks for a walkthrough, mental model, line-to-system explanation, code-close design explanation, or a section-by-section account of what a component reads, does, produces, checks, and deliberately leaves to another component. Also covers turning such an explanation into an illustrated, self-contained HTML page when the user asks for diagrams, a visual, or a document to keep or share.
+description: Explain source code, algorithms, APIs, data structures, execution flows, and implementation-oriented technical designs in concrete plain English. Use when a user asks for a walkthrough, mental model, line-to-system explanation, code-close design explanation, or a section-by-section account of what a component reads, does, produces, checks, and deliberately leaves to another component. Also covers turning such an explanation into a readable, self-contained HTML page when the user asks for diagrams, a visual, or a document to keep or share.
 ---
 
 # Explain Code
@@ -33,18 +33,33 @@ Respect the scope and pace requested by the user. If they ask about the lexer, f
 
 Treat “one section” as one complete component or topic, not as one item from the explanation workflow. Cover that component's useful input, output, execution, example, checks, and boundary in the current response. Use internal subsections when helpful, then stop before beginning the next component. Only give a single small subpart when the user explicitly asks for that subpart.
 
-For a substantial component, use this order:
+For a substantial component or design, build a textbook-style argument in this
+order:
 
-1. State its job.
-2. Describe its inputs and outputs.
-3. Show the smallest useful data shape.
-4. Walk through the algorithm in execution order.
-5. Trace one realistic example from input to output.
-6. State what is checked here.
-7. State what is not checked here, where it is checked, and why.
-8. Explain important failures, invariants, determinism, and resource costs.
+1. State the component boundary and the question this section answers.
+2. Begin with the smallest literal execution that makes the question concrete.
+   If the topic exists to prevent a failure or unsafe rewrite, show the input,
+   the tempting path, and the resulting failure, ambiguity, or changed answer.
+3. Point to the decisive step in plain English. For a failure, say something as
+   direct as: “See: only the grouping changed, but the result changed from 4 to
+   6.” Name the general concept only after the reader has seen it happen.
+4. If there is a real design choice, explain the obvious or existing approach,
+   the exact point where it stops working, and the realistic options with their
+   tradeoffs. Omit this step for a straightforward mechanism; never invent a
+   failure or competing option to fill the template.
+5. State what the code or design does and explain why next to any non-obvious
+   choice.
+6. Describe its inputs, outputs, and smallest useful data shape.
+7. Walk through the mechanism in execution order, then trace one realistic
+   example from input to output.
+8. State what is checked here, what is checked elsewhere and why, then cover
+   important failures, invariants, evidence, resource costs, and limitations.
 
-Compress or omit steps that add no value for a small function. Do not turn the order into a rigid questionnaire.
+The causal thread matters more than the headings: question → concrete execution
+→ mechanism → consequence. When there is a design fork, make the middle explicit:
+problem → choices → decision. Compress or omit steps that add no value for a
+small function. Do not manufacture alternatives, repeat the same fact under
+several headings, or turn the order into a rigid questionnaire.
 
 ## Stay close to implementation
 
@@ -122,6 +137,33 @@ Apply the same rule to claims such as safe, lossless, atomic, lazy, cached, conc
 
 If an algorithm produces one answer but that alone does not prove uniqueness or correctness, say what separate evidence or invariant is required.
 
+## Let the reader see the problem before naming it
+
+When a section has a “problem” part, put its smallest concrete example or
+counterexample there, not several screens later in a figure or evidence section.
+A generic description followed by a list of options asks the reader to infer
+the failure for themselves.
+
+Prefer:
+
+```text
+serial left fold:  ((10 - 3) - 2) - 1 = 4
+split into pairs:  (10 - 3) - (2 - 1) = 6
+```
+
+> See the problem: splitting the work changed only the grouping, yet the answer
+> changed from `4` to `6`. Therefore a compiler cannot split an arbitrary fold
+> into independent chains. It first needs evidence that this operation permits
+> regrouping; that property is called associativity.
+
+Avoid opening with two abstract paragraphs about “loop-carried dependencies”
+and “required algebra,” then moving straight to the options. The terms may be
+correct, but the reader has not yet seen why they matter.
+
+Use a diagram only if the spatial relationship adds something to the literal
+example. Often three lines of code or arithmetic plus one “See the problem”
+paragraph teach more than a large visual.
+
 ## Use examples as miniature executions
 
 Choose one small but realistic input. Show the important intermediate representation and final output, including positions or state changes when they matter.
@@ -169,11 +211,11 @@ Two habits that catch the failure:
 - State uncertainty or inference plainly instead of smoothing over it.
 - Use enough detail to make the mechanism clear, then stop.
 
-## Deliver an illustrated page
+## Deliver a readable page
 
 **The page is the deliverable.** Build one every time this skill is invoked.
-Everything above still applies — the figures replace none of it, they render the
-parts a reader would otherwise have to reconstruct.
+Everything above still applies. A page may contain no figures at all; prose,
+lists, code, and small exact tables are often the clearest explanation.
 
 The one exception is an explicit override. If the request says *quick*, *just
 tell me*, *in chat*, or otherwise asks for a short answer, give prose only. Do
@@ -192,52 +234,41 @@ paragraphs covering the conclusion, anything surprising, and anything the reader
 would act on. Not a summary of the page's table of contents, and not the whole
 explanation again — the page holds the detail.
 
-### Figures that carry information
+### Choose a visual by the information it adds
 
-Each of these renders a rule this skill already teaches. Choose the ones the
-subject actually contains; four strong figures beat ten weak ones.
+Start with prose or a normal list. Before adding a table, chart, diagram, panel,
+or multi-column layout, ask:
 
-| Figure | Use it for | It encodes |
-|---|---|---|
-| Stage map | a pipeline or multi-phase flow | execution order, and which stage is the weak one |
-| Side-by-side trace | any mechanism with a boundary | where it works, where it stops, and why |
-| Span strip | intervals tiling a linear domain | coverage — that the pieces tile it with no gap and no overlap |
-| Before and after | a rewrite, optimization, migration, or fix | what changed and what is preserved |
-| Data-shape panel | the representation the component owns | what the record holds, and what it conspicuously lacks |
-| Boundary ledger | responsibility limits | checked here, versus checked elsewhere and by whom |
-| Timeline | scheduling, retries, lifecycle, async, cache expiry | when things happen relative to each other |
-| Chart | numbers you actually have | magnitude, and the threshold that decides something |
+> What fact or relationship becomes easier to see here than in a paragraph or
+> list?
 
-Reach for the **span strip** whenever the subject divides a linear thing into
-pieces: lexer tokens over source, parser ranges, buffer regions, struct field
-offsets, byte protocol fields, diff hunks. A `<pre>` cursor trace reads as a log
-and never actually shows the coverage claim; the strip does, at a glance.
+If the answer is only “these items look grouped” or “the page looks designed,”
+do not add it. Cards or columns containing independent items are not diagrams.
+They usually reduce the space available for explanation without adding
+information.
 
-The stylesheet ships four more components the table does not name, because they
-are page furniture rather than figures: `.gates` for constraints that sit outside
-a sequence, `.keys` for headline figures, `.tiers` for ranked options, and
-`blockquote` for a real quotation. `.keys` is for any exact, load-bearing value —
-a measured time, but equally a count taken from the code, such as how many
-variants an enum has.
+Use a visual only when its geometry carries meaning:
 
-**The side-by-side trace is the highest-value figure for code, and it is the one
-to reach for first.** Two panels is the usual shape and three fit; more than
-three stops being a comparison. Run the *same* mechanism on two inputs — one it handles and
-one it does not — in two panels, using the real identifiers and the real
-intermediate values, and end each panel with a verdict line. A reader learns more
-from watching one relation succeed and fail than from any amount of description.
+| Form | Use it when it reveals |
+|---|---|
+| Side-by-side trace | the same mechanism behaving differently on two inputs |
+| Span strip | coverage, gaps, or overlap across a linear domain |
+| Before and after | both the change and what remains invariant |
+| Timeline or flow | causal or temporal order that is hard to follow in prose |
+| Chart | magnitude, trend, or a decision threshold in real numeric data |
+| Table | several exact mappings across the same columns |
+| Custom diagram | topology, ownership, nesting, or another spatial relation |
 
-```text
-┌── two calls ────────────── PROVED ───┐  ┌── one loop ────────── CANNOT ASK ───┐
-│ 'a → { root: pool, fields: [0] }     │  │ out[i] → { root: out, fields: [] }  │
-│ 'b → { root: pool, fields: [1] }     │  │ out[j] → { root: out, fields: [] }  │
-│                                      │  │                                     │
-│ prefix test: neither is a prefix     │  │ the index never reaches the test     │
-│ → independent, constant time         │  │ → identical place; even [0] vs [1]   │
-└──────────────────────────────────────┘  └──────────────────────────────────────┘
-```
+A simple sequence of stages is normally an ordered list. A few constraints are
+normally bullets. Several options need prose that explains the tradeoffs, or an
+exact comparison table when the same criteria apply to every option. Do not turn
+these into status cards, ornamental badges, or a dashboard.
 
-Every panel ends in a conclusion. A box with data and no verdict is decoration.
+When a side-by-side trace is useful, run the *same* mechanism on contrasting
+inputs, use real identifiers and intermediate values, and end each side with the
+conclusion. When a span strip is useful, make segment widths encode the actual
+interval widths. When a chart is useful, label inferred values as inferred and
+say what evidence would settle them.
 
 ### Let the typography separate the two voices
 
@@ -264,11 +295,10 @@ again from a figure they have already looked at.
 
 ### Make each component earn its place against a plain list
 
-The stylesheet offers boxes, grids and panels, and reaching for them is the
-default failure mode of a page. **A grid of four boxes, each holding a number and
-one line of text, is worse than four bullet points** — the boxes cap what each
-item can say, so the reasoning gets truncated to fit, and the reader gets less
-than prose would have given them.
+**A grid of four boxes, each holding a number and one line of text, is worse than
+four bullet points** — the boxes cap what each item can say, so the reasoning
+gets truncated to fit, and the reader gets less than prose would have given
+them.
 
 The test, applied to every component before you use it: *would the same items as
 a plain list carry more?* If yes, use the list. Layout is not information.
@@ -302,15 +332,17 @@ row of four stat boxes holding the same four numbers with their explanations cut
 - Do not invent structure the code lacks. If the component has three stages, the
   page has three, not a rounder number.
 
-### Building it — one fixed house style
+### Build it as a quiet technical document
 
 This skill is installed from the `explain-code-skills` repository; the copy under
 `assets/` next to this file is the one to use. If the assets named below are
 missing, the installed copy is stale — say so rather than improvising a
 substitute.
 
-The visual identity is settled and shipped. Do not design a new one per subject:
-these pages are one series, and a reader should recognize the second at a glance.
+The stylesheet is a neutral baseline, not an art direction. Keep the title,
+standfirst, headings, and prose on one aligned reading column. Let a comparison,
+table, chart, or diagram widen only when the additional width itself carries
+information. Do not add decoration to demonstrate the stylesheet.
 
 Write only the body — the masthead, the sections, the footer — and let the
 shipped script add everything else. Do not retype 30 KB of CSS and JS into a
@@ -328,9 +360,9 @@ The files next to this one:
 
 ```text
 assets/assemble.sh          builds a standalone page from a body fragment
-assets/house-style.css      tokens, type, and every component
-assets/comments.js          the review layer
-assets/page-skeleton.html   markup for each component; copy from here
+assets/house-style.css      neutral document styles and a few earned visuals
+assets/comments.js          passage-level review controls
+assets/page-skeleton.html   prose-first starting markup with optional examples
 ```
 
 **The two output modes differ, and one file cannot serve both.** A standalone
@@ -342,28 +374,32 @@ omit that wrapper and pass the body plus an inline `<style>` and `<script>`,
 since the host wraps it. When you do both, build the standalone file with
 `assemble.sh` and publish the unwrapped form.
 
-Two rules about the stylesheet. **Do not re-derive or re-validate the palette** —
-its light and dark steps already pass the lightness band, chroma floor,
-colorblind separation, normal-vision, and contrast checks. And do not restyle
-components per page; if a subject genuinely needs a figure the sheet lacks, add
-it in the sheet's idiom rather than inventing a local look.
+Do not restyle ordinary prose per page. If the subject genuinely needs a visual
+the sheet lacks, give that visual the smallest subject-specific styling needed
+to communicate its relationship, while keeping the surrounding document quiet.
 
 The page must stay self-contained — no external fonts, scripts, stylesheets, or
 images — because it may be read where network requests are blocked. Give wide
 content its own `overflow-x: auto` container so the body never scrolls sideways.
 
-If the host provides design or data-visualization skills, load them before
-writing markup or chart code and follow them where they do not conflict with the
-house style; where they do, the house style wins, since consistency across the
-series is the point.
+If the host provides a data-visualization skill, use it for a chart or diagram
+whose data actually warrants one. Do not invoke design tooling merely to style
+ordinary prose.
 
 ### Ship the review layer
 
-`assets/comments.js` lets the reader attach a note or a question to any section
-or figure, keeps them in `localStorage` across reloads, and exports the batch as
-markdown through a **Copy for Claude** button so it can be pasted straight back
-into a conversation. Selecting text before commenting quotes that text in the
-export.
+`assets/comments.js` places a small speech-bubble button beside each standfirst,
+direct prose paragraph, worked code example, list item, checkpoint, and figure
+caption. Clicking it opens a composer directly below that passage. The script
+keeps notes and questions in `localStorage` across reloads and exports the batch
+as markdown through a **Copy for Claude** button so it can be pasted straight
+back into a conversation. Selecting text within a passage before clicking its
+button quotes that text in the export.
+
+The script derives a fallback comment identity from the section and passage
+order. If a passage is likely to move while review comments must survive, give
+it a stable, page-unique `data-ec-id`; removed identities appear as orphaned
+comments instead of being silently discarded.
 
 Include it on every page. It declares no artifact capabilities and makes no
 network requests, so a local file and a published artifact behave identically —

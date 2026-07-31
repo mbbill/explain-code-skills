@@ -10,6 +10,8 @@ because the writer has done the reading and the reader has not.
 
 It helps Codex explain one complete component at a time by showing:
 
+- the smallest concrete execution that makes the question visible and, when
+  there is a failure, the exact step that fails;
 - what the component receives and produces;
 - the smallest useful data shapes;
 - the algorithm in execution order;
@@ -21,31 +23,35 @@ It helps Codex explain one complete component at a time by showing:
 The skill favors implementation-shaped explanations over broad summaries, but
 does not turn the answer into a line-by-line translation of the source.
 
-## Illustrated pages
+## Explanation pages
 
 Every invocation produces a self-contained HTML page, written to disk and also
 published as an artifact where the host supports it. Ask for something *quick* or
 *in chat* to get prose instead.
 
-Each figure renders one of the rules above: a stage map for execution order, a
-side-by-side trace for a mechanism's boundary, a before-and-after for a rewrite,
-a data-shape panel for the representation, a boundary ledger for responsibility
-limits, a timeline for ordering, and a chart only for measured numbers. The page
-keeps machine-produced text — identifiers, records, paths, values — in a
-monospace face and the argument in a prose face, so a reader can tell a claim
-from an observation at a glance.
+The default page is a quiet technical document: one aligned reading column,
+ordinary paragraphs and lists, and code where the mechanism needs it. A visual
+is optional. Side-by-side traces, span strips, timelines, charts, and tables
+appear only when their geometry communicates a comparison, coverage, sequence,
+magnitude, or exact mapping that prose would hide. Machine-produced text —
+identifiers, records, paths, values — stays in a monospace face so it remains
+visually distinct from the explanation.
 
-The visual identity is fixed rather than designed per subject, so a set of pages
-reads as one series. It ships as a stylesheet, a component skeleton, and a review
-script under [`explain-code/assets/`](explain-code/assets/).
+The shipped stylesheet is a neutral document baseline, not a reason to add
+layout. Prose stays in one aligned reading column; a comparison, table, chart,
+or diagram appears only when it communicates something a paragraph or list
+cannot. The assets live under [`explain-code/assets/`](explain-code/assets/).
 
 ## Reviewing a page
 
-Every page carries a review layer. Hover any section or figure for **+ comment**,
-or select text first to quote it, and file a note or a question. Comments persist
-in `localStorage` across reloads. When you have finished reading, **Copy for
-Claude** puts the whole batch on the clipboard as markdown, grouped by section
-and quoting whatever you highlighted — paste it back into the conversation.
+Every page carries a review layer. A small speech bubble sits beside each prose
+paragraph, worked code example, list item, checkpoint, and figure caption. Click
+the nearby bubble — or select text in that passage first to quote it — and file a
+note or question directly below the text. Comments persist in `localStorage`
+across reloads. When you have finished reading, **Copy for Claude** puts the
+whole batch on the clipboard as markdown, identifying each passage by its
+section and excerpt and quoting whatever you highlighted — paste it back into
+the conversation.
 
 It declares no artifact capabilities and makes no network requests, so a local
 file and a published artifact behave identically.
@@ -94,9 +100,9 @@ this kind of technical walkthrough.
 explain-code/
   SKILL.md
   assets/
-    house-style.css       tokens, typography, and every figure component
-    page-skeleton.html    markup for each component; the starting template
-    comments.js           the review layer
+    house-style.css       neutral document and earned-visual styles
+    page-skeleton.html    prose-first starting template
+    comments.js           passage-level review controls
   agents/
     openai.yaml
 ```

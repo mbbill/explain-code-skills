@@ -1,8 +1,8 @@
 /* ============================================================================
    explain-code review layer
    ----------------------------------------------------------------------------
-   Lets the reader attach notes and questions to any <section> or <figure>,
-   survive a reload, and export the batch as markdown to paste back into chat.
+   Lets the reader attach notes and questions to individual passages, survive a
+   reload, and export the batch as markdown to paste back into chat.
 
    Declares no artifact capabilities and makes no network requests, so the same
    file behaves identically opened locally and published. There is no runtime
@@ -49,63 +49,61 @@
     return c.textContent.replace(/\s+/g, " ").trim();
   }
 
-  /* A block's label is what the exported markdown groups under, so it must read
-     like something the user can find again. A div.fig panel -- key numbers, a
-     boundary ledger -- has neither heading nor caption, so it borrows its
-     section's heading rather than exporting as a meaningless "Block 8". */
-  function labelFor(block, index) {
-    var h = block.querySelector("h1, h2, h3");
-    if (h) return headingText(h);
-
-    var cap = block.querySelector("figcaption");
-    if (cap) {
-      var t = cap.textContent.replace(/\s+/g, " ").trim();
-      return clamp(t.split(".").slice(0, 2).join(".").trim(), 90);
-    }
-
-    var sec = block.closest("section");
-    var sh = sec && sec.querySelector("h1, h2, h3");
-    if (sh) return headingText(sh) + " \u2014 panel " + (index + 1);
-
-    return "Block " + (index + 1);
+  function passageText(block) {
+    var c = block.cloneNode(true);
+    c.querySelectorAll(".ec-pin, .ec-ui").forEach(function (n) { n.remove(); });
+    return c.textContent.replace(/\s+/g, " ").trim();
   }
 
-  var blocks = [].slice.call(document.querySelectorAll("section, figure, div.fig"))
-    .filter(function (b) { return !b.closest(".ec-dock"); });
+  function scopeFor(block) {
+    var sec = block.closest("section");
+    var sh = sec && sec.querySelector("h2");
+    return sh ? headingText(sh) : "Introduction";
+  }
 
-  var usedIds = {};
+  function labelFor(block, index) {
+    var text = clamp(passageText(block), 92);
+    return scopeFor(block) + (text ? " \u2014 \u201c" + text + "\u201d" : " \u2014 passage " + (index + 1));
+  }
+
+  var blocks = [].slice.call(document.querySelectorAll(
+    ".mast > .standfirst, section .col > p, section .col > pre, " +
+    "section .col > ul.prose > li, section .col > ol.prose > li, " +
+    "section > .checkpoint, figure > figcaption"
+  )).filter(function (b) { return !b.closest(".ec-ui, .ec-dock, .ec-note"); });
+
+  var scopeCounts = Object.create(null);
+  var usedIds = Object.create(null);
 
   blocks.forEach(function (block, i) {
     var label = labelFor(block, i);
-    var id = slug(label) || "block-" + i;
+    var scope = slug(scopeFor(block)) || "page";
+    scopeCounts[scope] = (scopeCounts[scope] || 0) + 1;
+    var explicitId = block.getAttribute("data-ec-id");
+    var id = explicitId || scope + "-passage-" + scopeCounts[scope];
     if (usedIds[id]) id = id + "-" + (i + 1);
     usedIds[id] = 1;
     block.dataset.ecId = id;
     block.dataset.ecLabel = label;
 
-    var rail = document.createElement("div");
-    rail.className = "ec-rail";
+    block.classList.add("ec-commentable");
 
     var add = document.createElement("button");
     add.type = "button";
-    add.className = "ec-add";
-    add.textContent = block.tagName === "FIGURE" ? "+ comment on figure"
-                    : block.classList.contains("fig") ? "+ comment on panel"
-                    : "+ comment";
-    add.setAttribute("aria-label", "Add a comment on: " + label);
+    add.className = "ec-pin";
+    add.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 5.5h14v10H9l-4 3v-13Z"></path><path d="M9 10.5h6"></path></svg>';
+    add.setAttribute("aria-label", "Comment on: " + clamp(passageText(block), 120));
     add.addEventListener("click", function () {
       var sel = lastSel.node && block.contains(lastSel.node) ? lastSel.text : "";
       openComposer(block, clamp(sel, 400));
     });
-
-    rail.appendChild(add);
+    block.insertBefore(add, block.firstChild);
 
     var ui = document.createElement("div");
     ui.className = "ec-ui";
-    ui.appendChild(rail);
     block._ecUi = ui;
-    if (block.tagName === "FIGURE") block.insertAdjacentElement("afterend", ui);
-    else block.appendChild(ui);
+    if (block.tagName === "LI") block.appendChild(ui);
+    else block.insertAdjacentElement("afterend", ui);
   });
 
   var orphans = document.createElement("div");
@@ -118,7 +116,7 @@
   document.addEventListener("mousedown", function (ev) {
     /* The press that collapses a selection also invalidates the memory of it --
        except on the review UI itself, whose button press must not eat the quote. */
-    if (!ev.target.closest(".ec-ui")) lastSel = { text: "", node: null };
+    if (!ev.target.closest(".ec-ui, .ec-pin")) lastSel = { text: "", node: null };
   });
 
   function captureSelection() {
@@ -281,14 +279,14 @@
       var host = block._ecUi;
       items.filter(function (c) { return c.block === block.dataset.ecId; })
         .forEach(function (c) {
-          host.insertBefore(makeCard(c, block), host.querySelector(".ec-rail"));
+          host.appendChild(makeCard(c, block));
         });
     });
 
-    /* Block identity is derived from heading text, so editing a heading between
-       review rounds silently detaches its comments. Without this they would still
-       be counted and still be exported, but be invisible and undeletable except
-       by wiping every comment on the page. */
+    /* A generated identity is the section plus passage ordinal. Authors can set
+       data-ec-id on a passage that must keep comments through reordering. Any
+       identity that disappears becomes an orphan instead of silently losing its
+       comments. */
     orphans.textContent = "";
     var lost = items.filter(function (c) { return !known[c.block]; });
     orphans.hidden = lost.length === 0;
@@ -391,7 +389,7 @@
     dock.classList.toggle("empty", items.length === 0);
     count.textContent = items.length
       ? ns + " note" + (ns === 1 ? "" : "s") + " · " + qs + " question" + (qs === 1 ? "" : "s")
-      : "Select text or click “+ comment” to review";
+      : "Click a speech bubble beside any passage to comment";
   }
 
   render();
