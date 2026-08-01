@@ -8,6 +8,13 @@ It teaches rather than summarizes: every imported concept is introduced by the
 smallest example that makes it obvious, at the point it first carries weight,
 because the writer has done the reading and the reader has not.
 
+Before it explains, it must earn the right to explain. The skill requires the
+agent to identify the current authority, trace the real mechanism end to end,
+recover the counterexample or constraint that motivates it, validate teaching
+examples, and distinguish specified, implemented, observed, historical, and
+proposed claims. If a central claim remains unresolved, the correct output is a
+specific evidence gap—not fluent guesswork or a polished page.
+
 It helps Codex explain one complete component at a time by showing:
 
 - the smallest concrete execution that makes the question visible and, when
@@ -25,9 +32,11 @@ does not turn the answer into a line-by-line translation of the source.
 
 ## Explanation pages
 
-Every invocation produces a self-contained HTML page, written to disk and also
-published as an artifact where the host supports it. Ask for something *quick* or
-*in chat* to get prose instead.
+After the understanding gate passes, an invocation produces a self-contained
+HTML page, written to disk and also published as an artifact where the host
+supports it. If the central mechanism cannot be established, the agent reports
+what is unknown and what evidence would settle it instead of manufacturing the
+page. Ask for something *quick* or *in chat* to get prose instead.
 
 The default page is a quiet technical document: one aligned reading column,
 ordinary paragraphs and lists, and code where the mechanism needs it. A visual

@@ -7,6 +7,59 @@ description: Explain source code, algorithms, APIs, data structures, execution f
 
 Help the reader picture the program executing. Stay concrete enough that they could sketch the implementation after reading the explanation.
 
+## Earn the right to explain
+
+Do not draft while you are still discovering the subject. Treat an explanatory
+source document as a set of claims to verify, not as authority merely because it
+is the requested document. Begin prose only after the understanding gate below
+passes for each topic.
+
+1. **Identify the authority.** Find the project's current normative source and
+   current-status source first. Use the active implementation, tests, and actual
+   output as evidence of what is built and observed; they do not silently
+   override a specification. Use design notes, commits, archived experiments,
+   and secondary explanations only for the version or rationale they actually
+   describe. For external contracts, use the official specification or
+   documentation. If authorities disagree, report the discrepancy instead of
+   choosing a convenient story.
+2. **Reconstruct the mechanism.** Trace the smallest concrete input through real
+   representations, state changes, calls, checks, and output or failure. For a
+   cross-layer or performance claim, continue through lowering, the backend fact
+   consumer, and observed output; a frontend invariant alone is not the mechanism.
+3. **Recover the reason at the level asked.** Reproduce the failure, counterexample,
+   or constraint. A question about a definition or design choice needs the real
+   alternatives and rationale, not merely an example of the chosen semantics.
+   Know whether that rationale is current, historical, inferred, or unrecorded.
+4. **Validate every teaching example.** Prefer an existing accepted test or
+   example. Make it expose the non-obvious distinction; an accepted example that
+   assumes the conclusion teaches nothing. Otherwise run it through the parser,
+   compiler, test, or reference implementation. Confirm a negative fails for the
+   claimed reason, recalculate numeric traces, and label unexecutable examples as
+   pseudocode or conceptual rather than accepted syntax or observed behavior.
+5. **Keep a claim ledger while researching.** For every central non-obvious
+   claim, record its supporting specification passage, implementation location,
+   test, run, output, or official external source, plus whether the claim is
+   *specified*, *implemented*, *observed*, *historical*, or *proposed*. A
+   historical result does not establish current behavior; a proposal does not
+   establish an implementation. Expose the status at the point where it
+   changes; a footer disclaimer cannot turn a current-tense description of a
+   historical mechanism into an accurate explanation. The ledger may stay
+   private, but the evidence must exist.
+
+Before drafting, be able to answer without guessing: What exact problem occurs?
+What exact mechanism handles it? Why does that mechanism work? What are its
+limits and responsibility boundaries? What is true in the current system, and
+what belongs only to a past experiment or future design? Has the example been
+validated?
+
+If a central answer remains unresolved after reasonable in-scope investigation,
+stop before drafting that topic. Do not bridge the gap with fluent prose,
+`likely`, `should`, or an unlabeled inference. State the exact unknown, the
+evidence checked, any conflict found, and what source, test, or owner decision
+would settle it. For a multi-topic request, explain only the independent topics
+whose gates pass and identify the omitted topics; do not publish a document that
+implies full coverage.
+
 ## Start with the component boundary
 
 Open with one plain paragraph that answers:
@@ -213,9 +266,11 @@ Two habits that catch the failure:
 
 ## Deliver a readable page
 
-**The page is the deliverable.** Build one every time this skill is invoked.
-Everything above still applies. A page may contain no figures at all; prose,
-lists, code, and small exact tables are often the clearest explanation.
+**After the understanding gate passes, the page is the deliverable.** Build one
+every time this skill is invoked. Everything above still applies. A page may
+contain no figures at all; prose, lists, code, and small exact tables are often
+the clearest explanation. A blocker or abstention report is not a page
+deliverable; do not manufacture a page merely to satisfy this section.
 
 The one exception is an explicit override. If the request says *quick*, *just
 tell me*, *in chat*, or otherwise asks for a short answer, give prose only. Do
@@ -416,6 +471,13 @@ comments already filed against it.
 
 Verify:
 
+- Can I point every central non-obvious claim to primary evidence?
+- Did every current-language or code example parse, run, or fail for the claimed
+  reason, or is it explicitly conceptual?
+- Did I keep specified, implemented, observed, historical, and proposed claims
+  separate?
+- Is any polished sentence hiding an unresolved question? If so, remove that
+  section and abstain.
 - Can the reader trace one input through the component?
 - Is every imported concept taught by example where it first carries weight, rather than named and left?
 - Did I show the important representation instead of only naming abstractions?
