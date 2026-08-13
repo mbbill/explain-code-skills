@@ -21,8 +21,10 @@ It helps Codex explain one complete component at a time by showing:
   there is a failure, the exact step that fails;
 - what the component receives and produces;
 - the smallest useful data shapes;
-- the algorithm in execution order;
-- a realistic input-to-output example;
+- the algorithm in execution order, threaded through one validated anchor
+  input rather than followed by a detached final example;
+- the relevant state before each step, selected code path, state change,
+  intermediate representation, and downstream handoff;
 - what is checked locally and what belongs elsewhere;
 - why non-obvious choices exist; and
 - how failures, invariants, determinism, and resource costs work when relevant.

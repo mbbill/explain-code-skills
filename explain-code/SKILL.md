@@ -103,8 +103,8 @@ order:
 5. State what the code or design does and explain why next to any non-obvious
    choice.
 6. Describe its inputs, outputs, and smallest useful data shape.
-7. Walk through the mechanism in execution order, then trace one realistic
-   example from input to output.
+7. Choose one validated anchor example, then walk through the mechanism in
+   execution order with that same input present at every consequential step.
 8. State what is checked here, what is checked elsewhere and why, then cover
    important failures, invariants, evidence, resource costs, and limitations.
 
@@ -217,11 +217,13 @@ Use a diagram only if the spatial relationship adds something to the literal
 example. Often three lines of code or arithmetic plus one “See the problem”
 paragraph teach more than a large visual.
 
-## Use examples as miniature executions
+## Thread one example through the execution
 
-Choose one small but realistic input. Show the important intermediate representation and final output, including positions or state changes when they matter.
+For a multi-step component, choose one small, validated anchor input before the detailed walkthrough. Do not explain the whole mechanism abstractly and append an input-to-output example afterward: the example is the walkthrough. Make it exercise several responsibilities without becoming a full-program distraction, preferably by reusing an existing test whose intermediates can be checked.
 
-Good examples expose boundaries and edge behavior. Avoid examples that simply repeat the happy-path prose without making the mechanism clearer.
+At every consequential step, show the useful subset of: state before; the real function, match arm, table entry, or condition selected; bytes or records consumed and state changed; the resulting representation; and what the next iteration or direct consumer receives. Track exact ranges, counters, collection contents, ownership, retention, or publication only when they explain the behavior. Use a compact trace table when those fields repeat, and omit helpers that do not affect the observed change.
+
+Label conceptual data shapes as conceptual. Carry the anchor through multiple passes, staged publication, and failure-atomic boundaries instead of collapsing them into one arrow. When claiming losslessness, ordering, identity preservation, or atomicity, reconstruct that property from the intermediates, then show which fields the direct downstream consumer reads, skips, and keeps reachable. Avoid final-output-only examples or a fresh input at every step.
 
 ## Teach every concept you import, where you first use it
 
@@ -476,9 +478,8 @@ Verify:
   reason, or is it explicitly conceptual?
 - Did I keep specified, implemented, observed, historical, and proposed claims
   separate?
-- Is any polished sentence hiding an unresolved question? If so, remove that
-  section and abstain.
-- Can the reader trace one input through the component?
+- Is any polished sentence hiding an unresolved question? If so, remove that section and abstain.
+- Can the reader trace the same validated input through every consequential step, including the relevant state before, selected decision, change, state after, and handoff?
 - Is every imported concept taught by example where it first carries weight, rather than named and left?
 - Did I show the important representation instead of only naming abstractions?
 - Did I follow execution order?
