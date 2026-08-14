@@ -80,36 +80,33 @@ Avoid:
 
 The first version gives the reader objects and actions they can follow. The second names a topic without explaining it.
 
+Before implementation detail, state one compact mental model of the component's transformation. Name what information it adds, removes, preserves, or deliberately leaves unresolved; why that boundary exists; and how the direct downstream consumer uses or resolves the result. This is not a slogan or a restatement of input/work/output. It is the smallest accurate abstraction that lets the reader organize every detail that follows.
+
+> Terminal classification attaches candidate grammar labels to each lexer token. It preserves overlapping possibilities because the concrete parse tree does not exist yet; the parser later selects the label admitted at that grammar position when building a successful derivation.
+
+Do not make the reader infer this model from the walkthrough. State it directly, then let the validated example prove and refine it.
+
 ## Explain one section at a time
 
 Respect the scope and pace requested by the user. If they ask about the lexer, finish the lexer and stop before the parser. If they ask for one section at a time, do not summarize the entire system first.
 
 Treat “one section” as one complete component or topic, not as one item from the explanation workflow. Cover that component's useful input, output, execution, example, checks, and boundary in the current response. Use internal subsections when helpful, then stop before beginning the next component. Only give a single small subpart when the user explicitly asks for that subpart.
 
-For a substantial component or design, build a textbook-style argument in this
-order:
+For a substantial component or design, build a textbook-style argument in this order:
 
 1. State the component boundary and the question this section answers.
-2. Begin with the smallest literal execution that makes the question concrete.
-   If the topic exists to prevent a failure or unsafe rewrite, show the input,
-   the tempting path, and the resulting failure, ambiguity, or changed answer.
-3. Point to the decisive step in plain English. For a failure, say something as
-   direct as: “See: only the grouping changed, but the result changed from 4 to
-   6.” Name the general concept only after the reader has seen it happen.
-4. If there is a real design choice, explain the obvious or existing approach,
-   the exact point where it stops working, and the realistic options with their
-   tradeoffs. Omit this step for a straightforward mechanism; never invent a
-   failure or competing option to fill the template.
-5. State what the code or design does and explain why next to any non-obvious
-   choice.
-6. Describe its inputs, outputs, and smallest useful data shape.
-7. Choose one validated anchor example, then walk through the mechanism in
-   execution order with that same input present at every consequential step.
-8. State what is checked here, what is checked elsewhere and why, then cover
-   important failures, invariants, evidence, resource costs, and limitations.
+2. State the core mental model in plain language: the information transformation, any choice left unresolved, and how the direct consumer resolves or uses it.
+3. Begin with the smallest literal execution that makes the question concrete.
+   If the topic exists to prevent a failure or unsafe rewrite, show the input, the tempting path, and the resulting failure, ambiguity, or changed answer.
+4. Point to the decisive step in plain English. For a failure, say something as direct as: “See: only the grouping changed, but the result changed from 4 to 6.” Name the general concept only after the reader has seen it happen.
+5. If there is a real design choice, explain the obvious or existing approach, the exact point where it stops working, and the realistic options with their tradeoffs. Omit this step for a straightforward mechanism; never invent a failure or competing option to fill the template.
+6. State what the code or design does and explain why next to any non-obvious choice.
+7. Describe its inputs, outputs, and smallest useful data shape.
+8. Choose one validated anchor example, then walk through the mechanism in execution order with that same input present at every consequential step.
+9. State what is checked here, what is checked elsewhere and why, then cover important failures, invariants, evidence, resource costs, and limitations.
 
-The causal thread matters more than the headings: question → concrete execution
-→ mechanism → consequence. When there is a design fork, make the middle explicit:
+The causal thread matters more than the headings: question → mental model →
+concrete execution → mechanism → consequence. When there is a design fork, make the middle explicit:
 problem → choices → decision. Compress or omit steps that add no value for a
 small function. Do not manufacture alternatives, repeat the same fact under
 several headings, or turn the order into a rigid questionnaire.
@@ -479,6 +476,7 @@ Verify:
 - Did I keep specified, implemented, observed, historical, and proposed claims
   separate?
 - Is any polished sentence hiding an unresolved question? If so, remove that section and abstain.
+- Before implementation detail, can the reader state the core information transformation, the choice left unresolved, and how the direct consumer uses or resolves it?
 - Can the reader trace the same validated input through every consequential step, including the relevant state before, selected decision, change, state after, and handoff?
 - Is every imported concept taught by example where it first carries weight, rather than named and left?
 - Did I show the important representation instead of only naming abstractions?

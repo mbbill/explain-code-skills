@@ -20,6 +20,8 @@ It helps Codex explain one complete component at a time by showing:
 - the smallest concrete execution that makes the question visible and, when
   there is a failure, the exact step that fails;
 - what the component receives and produces;
+- the core information transformation, what remains unresolved, and how the
+  direct downstream consumer uses or resolves it;
 - the smallest useful data shapes;
 - the algorithm in execution order, threaded through one validated anchor
   input rather than followed by a detached final example;
